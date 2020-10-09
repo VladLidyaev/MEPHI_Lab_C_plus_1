@@ -1,132 +1,171 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 
-struct Element{
-    int X;
-    int Y;
-    int value;
-    bool condition1;
+struct Coord{
+    float X;
+    float Y;
 };
 
+class Object{
+private:
+    float param_a,param_b,param_c;
 
-Element* AddStruct(Element* Obj,const int amount);
-void SetData(Element* Obj,const int amount,const int m,const int n);
-void ShowData(Element* Obj,const int amount,const int m,const int n);
-void ShowVector(Element* Obj,const int amount,const int m,const int n);
-void ChekingForACondition(Element* Obj,const int amount,const int m,const int n);
+public:
+
+    void SetDataParam(float new_param_a,float new_param_b,float new_param_c){
+        param_a = new_param_a;
+        param_b = new_param_b;
+        param_c = new_param_c;
+    }
+
+    void GetData(){
+        cout << "Уравнение Цепной Линии: y=a*(Cosh((x+b)/a))+c, где a=" << param_a << " ,b=" << param_b << " ,c=" << param_c << endl;
+    }
+
+    float GetOrd(float Abs){
+        float val = cosh((Abs+param_b)/param_a);
+        float Ord = param_a*val+param_c;
+        return Ord;
+    }
+
+    float GetLen(float Abs1,float Abs2){
+        if (Abs1<Abs2){
+            int value = Abs1;
+            Abs1 = Abs2 + param_b;
+            Abs2 = value + param_b;
+        } else{
+            Abs1 += param_b;
+            Abs2 += param_b;
+        }
+
+        float dop1 = sinh(Abs1/param_a);
+        float dop2 = sinh(Abs2/param_a);
+        return (param_a*(dop1-dop2)) ;
+    }
+
+    float GetRadius(float Abs){
+        Abs += param_b;
+        return ((GetOrd(Abs))*(GetOrd(Abs))/param_a);
+    }
+
+    Coord GetCentrCoord(float Abs){
+        float Radius = GetRadius(Abs);
+        float Ord = GetOrd(Abs);
+        float delta_x = 0.001;
+        float delta_y = Ord - GetOrd(Abs + delta_x);
+        Coord point;
+        point.X = (Radius/(sqrt(delta_x*delta_x +delta_y*delta_y)))*delta_y+Abs;
+        point.Y = (Radius/(sqrt(delta_x*delta_x +delta_y*delta_y)))*delta_x+Ord;
+        return point;
+    }
+
+    float GetSq(float Abs1, float  Abs2){
+        if (Abs1<Abs2){
+            int value = Abs1;
+            Abs1 = Abs2 + param_b;
+            Abs2 = value + param_b;
+        }
+        else{
+            Abs1 += param_b;
+            Abs2 += param_b;
+        }
+        float val1 = sinh(Abs1/param_a);
+        float val2 = sinh(Abs2/param_a);
+        return (param_a*(param_a*(val1-val2)) + (Abs1-Abs2)*param_c);
+    }
+
+};
+
+Object ans_1(Object Line){
+    float a,b,c;
+    cout << "Введите параметр a (!=0) из уравнения y=a*(Cosh((x+b)/a))+c" << endl;
+    cin >> a;
+    cout << "Введите параметр b из уравнения y=a*(Cosh((x+b)/a))+c" << endl;
+    cin >> b;
+    cout << "Введите параметр c из уравнения y=a*(Cosh((x+b)/a))+c" << endl;
+    cin >> c;
+    Line.SetDataParam(a,b,c);
+    return Line;
+};
+
+void ans_3(Object Line){
+    float Abs;
+    cout << "Введите абсциссу: " << endl;
+    cin >> Abs;
+    cout << "Значение ординаты : " << Line.GetOrd(Abs) << endl;
+};
+
+void ans_4(Object Line){
+    float Abs1,Abs2;
+    cout << "Введите первую абсциссу: " << endl;
+    cin >> Abs1;
+    cout << "Введите вторую абсциссу: " << endl;
+    cin >> Abs2;
+    cout << "Длина дуги кривой, ограниченная точками с введёнными абсциссами : " << Line.GetLen(Abs1,Abs2) << endl;
+};
+
+void ans_5(Object Line){
+    float Abs;
+    cout << "Введите абсциссу: " << endl;
+    cin >> Abs;
+    cout << "Радиус кривизны кривой в точке с введённой абсциссой : " << Line.GetRadius(Abs) << endl;
+};
+
+void ans_6(Object Line){
+    float Abs;
+    cout << "Введите абсциссу: " << endl;
+    cin >> Abs;
+    cout << "Кординаты центра кривизны кривой в точке с введённой абсциссой : X = " << Line.GetCentrCoord(Abs).X << " , Y = " << Line.GetCentrCoord(Abs).Y << endl;
+};
+
+void ans_7(Object Line){
+    float Abs1,Abs2;
+    cout << "Введите первую абсциссу: " << endl;
+    cin >> Abs1;
+    cout << "Введите вторую абсциссу: " << endl;
+    cin >> Abs2;
+    cout << "Площадь под кривой, ограниченная точками с введёнными абсциссами : " << Line.GetSq(Abs1,Abs2) << endl;
+};
 
 int main() {
     setlocale(LC_ALL,"rus");
-    Element* OurElements = 0;
-    int ContOrNo = 0;
-    int ElementAmount = 0;
-    int m;
-    int n;
-
-    cout << "Введите количество строк: ";
-    cin >> m;
-    cout << "Введите количество столбцов: ";
-    cin >> n;
-
-    do{
-        OurElements = AddStruct(OurElements, ElementAmount);
-        SetData(OurElements,ElementAmount,m,n);
-
-        ElementAmount++;
-
-        cout << "Продолжить ввод данных? (1 - Да, 0 - Нет)" << endl;
-        cin >> ContOrNo;
-        cin.get();
-    } while (ContOrNo != 0);
-
-    ShowData(OurElements, ElementAmount,m,n);
-    ChekingForACondition(OurElements,ElementAmount,m,n);
-    ShowVector(OurElements,ElementAmount,m,n);
-
-    delete [] OurElements;
+    int Ans ;
+    Object Line;
+    do {
+        cout << "0: Прекратить работу. \n  1: Задать параметры кривой. \n  2: Просмотр параметров кривой. \n  3: Получить ординату по значению абсциссы. \n  4: Получить длину дуги кривой, ограниченной данными абсциссами. \n  5: Получить радиус кривизны к точке с данной абсциссой. \n  6: Получить координаты центра кривизны в точке с данной абсциссой. \n  7: Получить площадь под линией между точками с данными абсциссами. " << endl;
+        cin >> Ans;
+        if ((Ans > 0)&&(Ans < 8)){
+            cout << "============" << endl;
+            switch (Ans) {
+                case 1:
+                    Line = ans_1(Line);
+                    break;
+                case 2:
+                    Line.GetData();
+                    break;
+                case 3:
+                    ans_3(Line);
+                    break;
+                case 4:
+                    ans_4(Line);
+                    break;
+                case 5:
+                    ans_5(Line);
+                    break;
+                case 6:
+                    ans_6(Line);
+                    break;
+                case 7:
+                    ans_7(Line);
+                    break;
+            }
+            cout << "============" << endl;
+        } else {
+            if (Ans != 0){
+                cout << "!!! Некорректный выбор. Повторите ввод." << endl;
+            }
+        }
+    } while (Ans != 0);
     return 0;
-}
-
-Element* AddStruct(Element* Obj,const int amount){
-    if (amount == 0){
-        Obj = new Element[amount+1];
-    } else {
-        Element* tempObj = new Element[amount+1];
-        for (int i=0; i<amount; i++){
-            tempObj[i] = Obj[i];
-        }
-        delete [] Obj;
-        Obj = tempObj;
-    }
-    return Obj;
-}
-
-void SetData(Element* Obj,const int amount,const int m,const int n){
-    int X;
-    int Y;
-    int value;
-    cout << "-----------------------" << endl;
-    cout << "Введите координату X: ";
-    cin >> X;
-    cout << "Введите координату Y: ";
-    cin >> Y;
-    cout << "Введите значение элемента: ";
-    cin >> value;
-    cout << "-----------------------" << endl;
-    cin.get();
-    if ((X>n)||(Y>m)){
-        cout << "Некорректные данные. Повторите ввод." << endl;
-        SetData(Obj,amount,m,n);
-    } else{
-        if(value!=0){
-            Obj[amount].X = X-1;
-            Obj[amount].Y = Y-1;
-            Obj[amount].value = value;
-        }
-    }
-    cout << endl;
-}
-
-
-void ShowData(Element* Obj,const int amount,const int m,const int n){
-    cout << "-----------------------" << endl;
-    cout << "Исходная матрица:" << endl;
-    for (int i = 0; i<m;i++){
-        for (int j = 0; j<n; j++){
-            int s = 0;
-            for (int k=0;k<amount;k++){
-                if ((Obj[k].X == j)&&(Obj[k].Y == i)){
-                    s = Obj[k].value;
-                }
-            }
-            cout << s << " ";
-        }
-        cout << endl;
-    }
-}
-
-void ChekingForACondition(Element* Obj,const int amount,const int m,const int n){
-    for (int i=0; i<amount; i++){
-        if (Obj[i].value/10 > 0){
-            Obj[i].condition1 = true;
-        } else{
-            Obj[i].condition1 = false;
-        }
-    }
-}
-
-void ShowVector(Element* Obj,const int amount,const int m,const int n){
-    int Vector[m];
-    cout << "-----------------------" << endl;
-    cout << "Полученный вектор:" << endl;
-    for (int i=0; i<m;i++){
-        int sum = 0;
-        for (int j=0; j<amount;j++){
-            if ((Obj[j].Y==i)&&(Obj[j].condition1 == true)){
-                sum += Obj[j].value;
-            }
-        }
-        Vector[i] = sum;
-        cout << Vector[i] << " ";
-    }
 }
