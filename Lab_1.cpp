@@ -5,15 +5,14 @@ struct Element{
     int X;
     int Y;
     int value;
-    bool condition1;
 };
 
 
 Element* AddStruct(Element* Obj,const int amount);
 void SetData(Element* Obj,const int amount,const int m,const int n);
 void ShowData(Element* Obj,const int amount,const int m,const int n);
+bool Condition(const int value);
 void ShowVector(Element* Obj,const int amount,const int m,const int n);
-void ChekingForACondition(Element* Obj,const int amount,const int m,const int n);
 
 int main() {
     setlocale(LC_ALL,"rus");
@@ -40,7 +39,6 @@ int main() {
     } while (ContOrNo != 0);
 
     ShowData(OurElements, ElementAmount,m,n);
-    ChekingForACondition(OurElements,ElementAmount,m,n);
     ShowVector(OurElements,ElementAmount,m,n);
 
     delete [] OurElements;
@@ -87,7 +85,6 @@ void SetData(Element* Obj,const int amount,const int m,const int n){
     cout << endl;
 }
 
-
 void ShowData(Element* Obj,const int amount,const int m,const int n){
     cout << "-----------------------" << endl;
     cout << "Исходная матрица:" << endl;
@@ -105,13 +102,11 @@ void ShowData(Element* Obj,const int amount,const int m,const int n){
     }
 }
 
-void ChekingForACondition(Element* Obj,const int amount,const int m,const int n){
-    for (int i=0; i<amount; i++){
-        if (Obj[i].value/10 > 0){
-            Obj[i].condition1 = true;
-        } else{
-            Obj[i].condition1 = false;
-        }
+bool Condition(const int value){
+    if ((value) / 10 >= 1) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -122,7 +117,7 @@ void ShowVector(Element* Obj,const int amount,const int m,const int n){
     for (int i=0; i<m;i++){
         int sum = 0;
         for (int j=0; j<amount;j++){
-            if ((Obj[j].Y==i)&&(Obj[j].condition1 == true)){
+            if ((Obj[j].Y==i) && (Condition(Obj[j].value))){
                 sum += Obj[j].value;
             }
         }
